@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Models Presentation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .presentation-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            min-height: 550px; /* Ensure a minimum height for consistent look */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Hide overflow from content */
+            position: relative;
+        }
+        .slide {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out; /* Slower transition */
+        }
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative; /* Bring active slide into normal flow */
+        }
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50; /* Dark blue-gray */
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            /* Animation for title */
+            animation: fadeInDown 0.8s ease-out forwards;
+        }
+        .slide-content {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #34495e; /* Medium blue-gray */
+            width: 100%;
+            /* Animation for content */
+            animation: fadeInUp 0.9s ease-out forwards;
+            animation-delay: 0.2s; /* Delay content animation */
+            opacity: 0; /* Start hidden for animation */
+        }
+        .slide.active .slide-content {
+            opacity: 1; /* Make visible when active */
+        }
+        .slide-content ul {
+            list-style-type: none; /* Remove default disc */
+            margin-left: 0;
+            padding-left: 0;
+            margin-bottom: 15px;
+        }
+        .slide-content ul li {
+            position: relative;
+            padding-left: 30px; /* Space for custom bullet/emoji */
+            margin-bottom: 10px;
+        }
+        .slide-content ul li::before {
+            content: attr(data-icon); /* Use data-icon for emoji */
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+            line-height: 1.7; /* Align with text */
+            top: 0;
+        }
+        .slide-content ol {
+            list-style-type: decimal;
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        .slide-content strong {
+            color: #2980b9; /* Strong blue */
+        }
+        .slide-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            border-top: 1px solid #ecf0f1; /* Light border */
+            background-color: #fdfefe; /* Slightly different background for controls */
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .nav-button {
+            background-color: #3498db; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .nav-button:disabled {
+            background-color: #bdc3c7; /* Gray when disabled */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .slide-indicator {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #bdc3c7;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+        .dot.active {
+            background-color: #3498db;
+            transform: scale(1.2);
+        }
+
+        /* Color Swatches for RGB/CMYK */
+        .color-swatch-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .color-swatch:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .presentation-container {
+                min-height: 500px;
+                margin: 10px;
+            }
+            .slide {
+                padding: 25px;
+            }
+            .slide-title {
+                font-size: 2rem;
+            }
+            .slide-content {
+                font-size: 1rem;
+            }
+            .navigation-buttons {
+                padding: 15px 25px;
+            }
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .color-swatch {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .presentation-container {
+                min-height: 450px;
+            }
+            .slide {
+                padding: 20px;
+            }
+            .slide-title {
+                font-size: 1.8rem;
+            }
+            .slide-content {
+                font-size: 0.9rem;
+            }
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px 20px;
+            }
+            .nav-button {
+                width: 100%;
+                text-align: center;
+            }
+            .slide-indicator {
+                justify-content: center;
+                margin-top: 10px;
+            }
+            .color-swatch {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div id="slides-wrapper" class="relative flex-grow">
+            <!-- Slide 0: Title Slide -->
+            <div class="slide active" data-slide="0">
+                <h1 class="slide-title">Color Models: An Overview 🎨</h1>
+                <div class="slide-content text-center">
+                    <p class="text-lg mb-4">Exploring how colors are defined and represented. ✨</p>
+                    <p class="text-md text-gray-600">A presentation by Fredrick M. Morara</p>
+                </div>
+            </div>
+
+            <!-- Slide 1: Definitions -->
+            <div class="slide" data-slide="1">
+                <h2 class="slide-title">1. Defining Key Terms 📚</h2>
+                <div class="slide-content">
+                    <ul>
+                        <li data-icon="🔵"><strong>Color:</strong> Color is the property of light that depends on its wavelength and is perceived by the eye as red, blue, yellow, or other hues. It's how humans visually distinguish between objects based on the light they reflect, transmit, or emit. The human eye perceives color through specialized photoreceptor cells called cones, which are sensitive to different wavelengths of light.</li>
+                        <li data-icon="🔴"><strong>Hue:</strong> Hue is the purest form of a color, corresponding to its dominant wavelength within the visible light spectrum. It's what we typically refer to as the "name" of a color, such as red, green, blue, yellow, etc. On a color wheel, hue is represented by the angle.</li>
+                        <li data-icon="💧"><strong>Saturation:</strong> Saturation (also known as chroma) refers to the intensity or purity of a color. A highly saturated color is vivid and rich, while a desaturated color appears duller or grayer. It represents the amount of gray in a color; less gray means more saturation. For example, a pure red is highly saturated, while a pale pink is less saturated.</li>
+                        <li data-icon="☀️"><strong>Brightness:</strong> Brightness (also known as value or lightness) refers to the perceived intensity of light reflected from a surface or emitted by a light source. It determines how light or dark a color appears, ranging from black (no brightness) to white (maximum brightness). Adjusting brightness changes the overall luminance of a color without altering its hue or saturation.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 2: RGB -->
+            <div class="slide" data-slide="2">
+                <h2 class="slide-title">2. RGB (Red, Green, Blue) 💡</h2>
+                <div class="slide-content">
+                    <h3>Description:</h3>
+                    <ul>
+                        <li data-icon="➕">The RGB color model is an <strong>additive</strong> color model, meaning that different amounts of red, green, and blue light are added together to produce a wide range of colors.</li>
+                        <li data-icon="✨">Each color component (Red, Green, Blue) typically ranges from 0 to 255 in digital systems. For example, `rgb(255, 0, 0)` is pure red, `rgb(0, 255, 0)` is pure green, and `rgb(0, 0, 255)` is pure blue.</li>
+                        <li data-icon="⚪">When all three colors are combined at their full intensity (`rgb(255, 255, 255)`), they produce white light. When all are at zero intensity (`rgb(0, 0, 0)`), they produce black.</li>
+                        <li data-icon="🔄">This model is based on the way human eyes perceive color, as our retinas have cone cells sensitive to red, green, and blue light.</li>
+                    </ul>
+                    <div class="color-swatch-container">
+                        <div class="color-swatch" style="background-color: #FF0000;"></div>
+                        <div class="color-swatch" style="background-color: #00FF00;"></div>
+                        <div class="color-swatch" style="background-color: #0000FF;"></div>
+                    </div>
+                    <h3>Applications:</h3>
+                    <ul>
+                        <li data-icon="🖥️"><strong>Computer Monitors and Televisions:</strong> These displays use tiny red, green, and blue light-emitting elements (pixels) to create the images you see.</li>
+                        <li data-icon="📸"><strong>Digital Cameras:</strong> Image sensors in digital cameras capture light in red, green, and blue channels, which are then processed to form a full-color image.</li>
+                        <li data-icon="🌐"><strong>Web Design and Digital Graphics:</strong> Colors on websites and in digital art are often specified using RGB or hexadecimal (e.g., `#FF0000`) values, which are direct representations of RGB.</li>
+                        <li data-icon="💡"><strong>LED Lighting:</strong> Many modern LED lights and stage lighting systems use RGB combinations to produce a wide spectrum of colors and dynamic lighting effects.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 3: YIQ -->
+            <div class="slide" data-slide="3">
+                <h2 class="slide-title">3. YIQ 📺</h2>
+                <div class="slide-content">
+                    <h3>Description:</h3>
+                    <ul>
+                        <li data-icon="📡">The YIQ color model is primarily used in the <strong>NTSC (National Television System Committee) analog television broadcasting system</strong>, particularly in North and South America, and Japan.</li>
+                        <li data-icon="🔆">'Y' represents the <strong>luma</strong> (brightness/luminance) component, which carries the black-and-white information of the image. This is crucial for backward compatibility.</li>
+                        <li data-icon="🎨">'I' (in-phase) and 'Q' (quadrature) represent the <strong>chrominance</strong> (color) components. These signals carry the color difference information, allowing for the reconstruction of the full color signal.</li>
+                        <li data-icon="🔄">Its design allowed black-and-white television sets to receive and display color broadcasts in monochrome (by only processing the 'Y' signal), while color sets could decode the full color signal by combining 'Y', 'I', and 'Q'.</li>
+                        <li data-icon="📉">The 'I' and 'Q' components are transmitted with reduced bandwidth compared to 'Y', exploiting the human eye's lower sensitivity to color detail than to luminance detail.</li>
+                    </ul>
+                    <h3>Applications:</h3>
+                    <ul>
+                        <li data-icon="📺"><strong>NTSC Analog Television Broadcasting:</strong> This is its primary and almost exclusive application, enabling backward compatibility and efficient transmission of color signals over existing monochrome infrastructure.</li>
+                        <li data-icon="📼"><strong>Historical Video Encoding/Decoding:</strong> Used extensively in hardware for NTSC video processing, including VCRs, camcorders, and broadcast equipment.</li>
+                        <li data-icon="➡️">While largely superseded by digital video standards (like ATSC, DVB) today, understanding YIQ is important for comprehending the evolution of television technology.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 4: CMY/CMYK -->
+            <div class="slide" data-slide="4">
+                <h2 class="slide-title">4. CMY / CMYK 🖨️</h2>
+                <div class="slide-content">
+                    <h3>Description:</h3>
+                    <ul>
+                        <li data-icon="➖">CMY is a <strong>subtractive</strong> color model, meaning that colors are created by subtracting light. This is achieved by pigments absorbing certain wavelengths of light and reflecting others.</li>
+                        <li data-icon="🎨">The primary subtractive colors are Cyan (C), Magenta (M), and Yellow (Y). These are the complements of Red, Green, and Blue, respectively.</li>
+                        <li data-icon="⚫">When CMY inks are mixed in equal proportions, they theoretically produce black (by absorbing all light). However, due to impurities in inks, a pure CMY mixture often results in a muddy brown.</li>
+                        <li data-icon="➕">For this reason, CMYK adds a "Key" (K) ink, which is pure black. The 'K' component is essential for achieving true, rich blacks, improving shadow detail, and reducing ink consumption for text and dark areas.</li>
+                        <li data-icon="📊">This model is based on how pigments absorb light, making it ideal for physical printing.</li>
+                    </ul>
+                    <div class="color-swatch-container">
+                        <div class="color-swatch" style="background-color: #00FFFF;"></div>
+                        <div class="color-swatch" style="background-color: #FF00FF;"></div>
+                        <div class="color-swatch" style="background-color: #FFFF00;"></div>
+                        <div class="color-swatch" style="background-color: #000000;"></div>
+                    </div>
+                    <h3>Applications:</h3>
+                    <ul>
+                        <li data-icon="🖨️"><strong>Printing (Commercial and Desktop):</strong> This is the dominant color model for almost all color printing processes, including inkjet, laser, and offset printing. It's used for everything from magazines and brochures to photographs and posters.</li>
+                        <li data-icon="📦"><strong>Packaging Design:</strong> Colors for product packaging are typically prepared using CMYK to ensure accurate reproduction on various printing materials.</li>
+                        <li data-icon="🖌️"><strong>Paint and Pigment Industries:</strong> Many paint and pigment formulations are based on subtractive color mixing principles, although they may not strictly adhere to the CMYK standard.</li>
+                        <li data-icon="👕"><strong>Textile Printing:</strong> Used in the textile industry for printing designs on fabrics, where the dyes act as subtractive pigments.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 5: HSV -->
+            <div class="slide" data-slide="5">
+                <h2 class="slide-title">5. HSV (Hue, Saturation, Value) 🎨</h2>
+                <div class="slide-content">
+                    <h3>Description:</h3>
+                    <ul>
+                        <li data-icon="⚙️">HSV (Hue, Saturation, Value), also known as HSB (Hue, Saturation, Brightness), is a cylindrical color model designed to be more intuitive for human perception than RGB or CMYK.</li>
+                        <li data-icon="🎡"><strong>Hue:</strong> Represents the color type (e.g., red, orange, yellow, green, blue, violet). It is measured as an angle around a central vertical axis, typically ranging from 0 to 360 degrees (e.g., red is 0°, green is 120°, blue is 240°).</li>
+                        <li data-icon="💧"><strong>Saturation:</strong> Describes the purity or intensity of the color. It ranges from 0% (which is a shade of gray) to 100% (the purest, most vivid color). As saturation decreases, the color appears more washed out or faded.</li>
+                        <li data-icon="💡"><strong>Value (Brightness):</strong> Refers to the lightness or darkness of the color. It ranges from 0% (black) to 100% (the full, pure color at its maximum brightness). Adjusting value is like adding black or white to the color.</li>
+                        <li data-icon="🧠">This model separates color information (hue and saturation) from intensity information (value), making it easier for artists and designers to select and manipulate colors based on how they naturally think about them.</li>
+                    </ul>
+                    <h3>Applications:</h3>
+                    <ul>
+                        <li data-icon="🖼️"><strong>Image Editing Software:</strong> Popular in programs like Adobe Photoshop, GIMP, and other graphic design tools, as it allows users to adjust color attributes in a way that feels more natural and less technical than RGB values.</li>
+                        <li data-icon="💻"><strong>Computer Graphics and Visualization:</strong> Used in algorithms for color selection, blending, and analysis due to its perceptual linearity. It's often preferred for creating color gradients and palettes.</li>
+                        <li data-icon="🖌️"><strong>Color Pickers:</strong> Many digital color pickers and color selection interfaces in software applications use the HSV model to simplify the process of choosing desired colors.</li>
+                        <li data-icon="👁️"><strong>Computer Vision:</strong> Sometimes employed in computer vision tasks, such as color-based object detection and segmentation, because it can be more robust to variations in lighting conditions by separating luminance (value) from chrominance (hue and saturation).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 6: Conclusion -->
+            <div class="slide" data-slide="6">
+                <h2 class="slide-title">Thank You! 🙏</h2>
+                <div class="slide-content text-center">
+                    <p class="text-lg mb-4">Understanding color models is crucial for various digital and physical applications, from screen display to professional printing. 🌟</p>
+                    <p class="text-md text-gray-600">Feel free to ask any further questions! 🤔</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <button id="prevBtn" class="nav-button" disabled>Previous</button>
+            <div id="slideIndicator" class="slide-indicator"></div>
+            <button id="nextBtn" class="nav-button">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideIndicator = document.getElementById('slideIndicator');
+        let currentSlide = 0;
+
+        // Initialize slide indicator dots
+        function createDots() {
+            slides.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => showSlide(index));
+                slideIndicator.appendChild(dot);
+            });
+        }
+
+        // Update active slide and buttons
+        function showSlide(index) {
+            // Ensure index is within bounds
+            if (index < 0) {
+                index = 0;
+            } else if (index >= slides.length) {
+                index = slides.length - 1;
+            }
+
+            // Remove active class from all slides and dots, and reset animations
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                // Reset animations by removing and re-adding classes
+                const title = slide.querySelector('.slide-title');
+                const content = slide.querySelector('.slide-content');
+                if (title) {
+                    title.style.animation = 'none';
+                    title.offsetHeight; /* Trigger reflow */
+                    title.style.animation = null;
+                }
+                if (content) {
+                    content.style.animation = 'none';
+                    content.offsetHeight; /* Trigger reflow */
+                    content.style.animation = null;
+                }
+            });
+            document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+
+            // Add active class to the current slide and dot
+            slides[index].classList.add('active');
+            document.querySelector(`.dot[data-index="${index}"]`).classList.add('active');
+
+            currentSlide = index;
+
+            // Update button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        // Event listeners for navigation buttons
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                showSlide(currentSlide + 1);
+            }
+        });
+
+        // Initialize presentation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            createDots();
+            showSlide(0); // Show the first slide
+        });
+    </script>
+</body>
+</html>
